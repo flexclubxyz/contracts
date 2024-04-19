@@ -24,7 +24,7 @@ contract AaveStokvel {
         aaveInstance = IPool(_addressProvider);
     }
 
-   function depositUSDC(uint256 _amount) public {
+  function depositUSDC(uint256 _amount) public {
     usdcBalances[msg.sender] += _amount;
     uint256 allowance = usdc.allowance(msg.sender, address(this));
     require(allowance >= _amount, "Check the token allowance");
@@ -40,6 +40,10 @@ contract AaveStokvel {
     // Deposit USDC tokens into the Aave pool
     aaveInstance.supply(usdcAddress, _amount, address(this), 0);
 }
+
+    function getBalance() public view returns (uint256) {
+        return IERC20(usdcAddress).balanceOf(address(this));
+    }
 
     function getUserUSDCBalance(
         address _userAddress
