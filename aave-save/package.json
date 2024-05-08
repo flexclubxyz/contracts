@@ -24,7 +24,7 @@
     "@types/node": ">=18.0.0",
     "chai": "^4.2.0",
     "ethers": "^6.4.0",
-    "hardhat": "^2.22.2",
+    "hardhat": "^2.22.3",
     "hardhat-gas-reporter": "^1.0.8",
     "solidity-coverage": "^0.8.0",
     "ts-node": ">=8.0.0",
@@ -34,5 +34,6 @@
   "dependencies": {
     "@aave/core-v3": "^1.19.3",
     "dotenv": "^16.4.5"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }

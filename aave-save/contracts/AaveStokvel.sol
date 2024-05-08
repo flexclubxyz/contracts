@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 // Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 import {IPool} from "@aave/core-v3/contracts/interfaces/IPool.sol";
@@ -24,22 +24,23 @@ contract AaveStokvel {
         aaveInstance = IPool(_addressProvider);
     }
 
-  function depositUSDC(uint256 _amount) public {
-    usdcBalances[msg.sender] += _amount;
-    uint256 allowance = usdc.allowance(msg.sender, address(this));
-    require(allowance >= _amount, "Check the token allowance");
+    function depositUSDC(uint256 _amount) public {
+        uint256 allowance = usdc.allowance(msg.sender, address(this));
+        require(allowance >= _amount, "Check the token allowance");
 
-    // Transfer USDC tokens from the user to this contract
-    bool success = usdc.transferFrom(msg.sender, address(this), _amount);
-    require(success, "USDC transfer failed");
+        // // Transfer USDC tokens from the user to this contract
+        bool success = usdc.transferFrom(msg.sender, address(this), _amount);
+        require(success, "USDC transfer failed");
 
-    // Approve the Aave pool to spend the USDC tokens
-    success = usdc.approve(address(aaveInstance), _amount);
-    require(success, "USDC approval failed");
+        // // Approve the Aave pool to spend the USDC tokens
+        success = usdc.approve(address(aaveInstance), _amount);
+        require(success, "USDC approval failed");
 
-    // Deposit USDC tokens into the Aave pool
-    aaveInstance.supply(usdcAddress, _amount, address(this), 0);
-}
+        // // Deposit USDC tokens into the Aave pool
+        aaveInstance.supply(usdcAddress, _amount, address(this), 0);
+
+        usdcBalances[msg.sender] += _amount;
+    }
 
     function getBalance() public view returns (uint256) {
         return IERC20(usdcAddress).balanceOf(address(this));

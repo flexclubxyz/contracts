@@ -7,6 +7,11 @@ const config: HardhatUserConfig = {
   solidity: "0.8.24",
   // defaultNetwork: "base-sepolia",
   networks: {
+    "hardhat": {
+      forking: {
+        url: "https://base-sepolia.g.alchemy.com/v2/ERdNIFUjt_gcV-nkJArxhLI-QbnTtUgT"
+      }
+    },
     "base-sepolia": {
       url: "https://sepolia.base.org",
       accounts: [process.env.WALLET_KEY as string],
@@ -16,7 +21,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      "base-sepolia": process.env.BASESCAN_API_KEY,
+      "base-sepolia": process.env.BASESCAN_API_KEY!,
     },
     customChains: [
       {
