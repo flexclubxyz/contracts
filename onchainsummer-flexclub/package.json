@@ -15,6 +15,7 @@
     "@types/mocha": ">=9.1.0",
     "chai": "^4.2.0",
     "hardhat": "^2.22.5",
+    "hardhat-deploy": "^0.12.4",
     "hardhat-gas-reporter": "^1.0.8",
     "solidity-coverage": "^0.8.1",
     "ts-node": "^10.9.2",
