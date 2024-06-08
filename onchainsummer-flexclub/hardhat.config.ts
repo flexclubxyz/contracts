@@ -9,7 +9,9 @@ dotenv.config();
 const config: HardhatUserConfig = {
   solidity: "0.8.20",
   namedAccounts: {
-    deployer: 0,
+    deployer: {
+      default: 0,
+    },
   },
   networks: {
     base_sepolia: {

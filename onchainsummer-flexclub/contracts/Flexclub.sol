@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {IERC20} from "@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol";
 import {IPool} from "@aave/core-v3/contracts/interfaces/IPool.sol";
 import {IPoolAddressesProvider} from "@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol";
 
-contract FlexClub {
+contract FlexClub is ReentrancyGuard {
     struct Goal {
         string name;
         string goal;
@@ -37,7 +38,7 @@ contract FlexClub {
         aToken = IERC20(_aTokenAddress);
     }
 
-    function deposit(uint256 amount) public {
+    function deposit(uint256 amount) public nonReentrant {
         require(block.timestamp < goal.deadline, "The deadline has passed.");
         IERC20(usdcTokenAddress).transferFrom(msg.sender, address(this), amount);
         balances[msg.sender] += amount;
@@ -50,20 +51,27 @@ contract FlexClub {
         lendingPool.supply(usdcTokenAddress, amount, address(this), 0);
 
         // Store initial aToken balance after deposit
-        initialATokenBalance = aToken.balanceOf(address(this));
+        if (initialATokenBalance == 0) {
+            initialATokenBalance = aToken.balanceOf(address(this));
+        }
     }
 
-    function withdraw(uint256 amount) public {
-        require(balances[msg.sender] >= amount, "Insufficient balance");
+    function withdraw(uint256 amount) public nonReentrant {
+        uint256 effectiveBalance = getEffectiveBalance(msg.sender);
+        require(effectiveBalance >= amount, "Insufficient balance");
 
         // Withdraw from Aave
         IPool lendingPool = IPool(provider.getPool());
         lendingPool.withdraw(usdcTokenAddress, amount, address(this));
 
         IERC20(usdcTokenAddress).transfer(msg.sender, amount);
-        balances[msg.sender] -= amount;
+        balances[msg.sender] = effectiveBalance - amount;
         goal.pooled -= amount;
-        goal.flexers -= 1;
+
+        // Update initial aToken balance after withdrawal
+        if (goal.pooled == 0) {
+            initialATokenBalance = 0;
+        }
     }
 
     function getGoalInfo() public view returns (string memory, string memory, uint256, uint256, uint256, uint256) {
@@ -77,5 +85,10 @@ contract FlexClub {
     function calculateInterestEarned() public view returns (uint256) {
         uint256 currentATokenBalance = aToken.balanceOf(address(this));
         return currentATokenBalance > initialATokenBalance ? currentATokenBalance - initialATokenBalance : 0;
+    }
+
+    function getEffectiveBalance(address user) public view returns (uint256) {
+        uint256 userShare = (balances[user] * aToken.balanceOf(address(this))) / goal.pooled;
+        return userShare;
     }
 }
