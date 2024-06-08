@@ -1,7 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
+import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy";
-import "@typechain/hardhat";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -12,12 +12,6 @@ const config: HardhatUserConfig = {
     deployer: 0,
   },
   networks: {
-    // base_goerli: {
-    //   url: "https://goerli.base.org",
-    //   accounts: {
-    //     mnemonic: process.env.MNEMONIC ?? "",
-    //   },
-    // },
     base_sepolia: {
       url: `https://base-sepolia.g.alchemy.com/v2/${
         process.env.ALCHEMY_SEPOLIA_KEY ?? ""
@@ -32,12 +26,6 @@ const config: HardhatUserConfig = {
         },
       },
     },
-    // mumbai: {
-    //   url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_MUMBAI_KEY ?? ""}`,
-    //   accounts: {
-    //     mnemonic: process.env.MNEMONIC ?? "",
-    //   },
-    // },
     hardhat: {
       forking: {
         url: `https://eth-mainnet.g.alchemy.com/v2/${
@@ -46,18 +34,6 @@ const config: HardhatUserConfig = {
         enabled: true,
       },
     },
-  },
-  typechain: {
-    outDir: "typechain",
-    target: "ethers-v5",
-  },
-  external: {
-    contracts: [
-      {
-        artifacts: "node_modules/@aave/deploy-v3/artifacts",
-        deploy: "node_modules/@aave/deploy-v3/dist/deploy",
-      },
-    ],
   },
 };
 

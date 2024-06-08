@@ -1,11 +1,9 @@
 import { expect } from "chai";
 import { ethers, deployments, getNamedAccounts } from "hardhat";
 import { FlexClub } from "../typechain/FlexClub";
-import { MockERC20 } from "../typechain/MockERC20";
 
 describe("FlexClub", function () {
   let flexClub: FlexClub;
-  let mockUSDC: MockERC20;
   let deployer: string;
   let user: any;
 
