@@ -9,6 +9,7 @@ contract Lock {
     address payable public owner;
 
     event Withdrawal(uint amount, uint when);
+    event Deposit(uint amount, uint when);
 
     constructor(uint _unlockTime) payable {
         require(
@@ -31,4 +32,15 @@ contract Lock {
 
         owner.transfer(address(this).balance);
     }
+
+// New function to allow deposits if lock period has not occured yet
+    function deposit() public payable {
+        require(
+            block.timestamp <= unlockTime,
+            "You can't deposit after unlock"
+        );
+        require(msg.sender == owner, "You aren't the owner");
+
+        emit Deposit(msg.value, block.timestamp);
+    } 
 }
