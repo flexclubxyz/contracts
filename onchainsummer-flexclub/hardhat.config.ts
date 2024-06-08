@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-deploy";
+import "@typechain/hardhat";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -32,9 +33,7 @@ const config: HardhatUserConfig = {
       },
     },
     // mumbai: {
-    //   url: `https://polygon-mumbai.g.alchemy.com/v2/${
-    //     process.env.ALCHEMY_MUMBAI_KEY ?? ""
-    //   }`,
+    //   url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_MUMBAI_KEY ?? ""}`,
     //   accounts: {
     //     mnemonic: process.env.MNEMONIC ?? "",
     //   },
@@ -47,6 +46,18 @@ const config: HardhatUserConfig = {
         enabled: true,
       },
     },
+  },
+  typechain: {
+    outDir: "typechain",
+    target: "ethers-v5",
+  },
+  external: {
+    contracts: [
+      {
+        artifacts: "node_modules/@aave/deploy-v3/artifacts",
+        deploy: "node_modules/@aave/deploy-v3/dist/deploy",
+      },
+    ],
   },
 };
 
