@@ -28,6 +28,20 @@ const config: HardhatUserConfig = {
         },
       },
     },
+    base_mainnet: {
+      url: `https://base-mainnet.g.alchemy.com/v2/${
+        process.env.ALCHEMY_MAINNET_KEY ?? ""
+      }`,
+      accounts: {
+        mnemonic: process.env.MNEMONIC ?? "",
+      },
+      verify: {
+        etherscan: {
+          apiUrl: "https://api.basescan.org/",
+          apiKey: process.env.ETHERSCAN_API_KEY,
+        },
+      },
+    },
     hardhat: {
       forking: {
         url: `https://eth-mainnet.g.alchemy.com/v2/${
