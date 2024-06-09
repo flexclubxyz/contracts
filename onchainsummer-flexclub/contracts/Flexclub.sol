@@ -14,14 +14,20 @@ contract FlexClub is ReentrancyGuard {
         uint256 target;
         uint256 deadline;
         uint256 flexers;
+        uint256 pooledWithInterest;
     }
 
-    mapping(address => uint256) public balances;
+    mapping(address => uint256) public balanceWithoutInterest;
+    mapping(address => bool) private hasDeposited;
     Goal public goal;
     address public usdcTokenAddress;
     IPoolAddressesProvider public provider;
     IERC20 public aToken;
     uint256 public initialATokenBalance;
+
+    event Deposit(address indexed user, uint256 amount);
+    event Withdrawal(address indexed user, uint256 amount);
+    event GoalInfoUpdated(string name, string goal, uint256 pooled, uint256 target, uint256 deadline, uint256 flexers, uint256 pooledWithInterest);
 
     constructor(
         address _usdcTokenAddress,
@@ -34,26 +40,32 @@ contract FlexClub is ReentrancyGuard {
     ) {
         usdcTokenAddress = _usdcTokenAddress;
         provider = IPoolAddressesProvider(_provider);
-        goal = Goal(goalName, goalDescription, 0, targetAmount, _deadline, 0);
+        goal = Goal(goalName, goalDescription, 0, targetAmount, _deadline, 0, 0);
         aToken = IERC20(_aTokenAddress);
     }
 
     function deposit(uint256 amount) public nonReentrant {
         require(block.timestamp < goal.deadline, "The deadline has passed.");
         IERC20(usdcTokenAddress).transferFrom(msg.sender, address(this), amount);
-        balances[msg.sender] += amount;
+        balanceWithoutInterest[msg.sender] += amount;
         goal.pooled += amount;
-        goal.flexers += 1;
+
+        // Update unique depositor count
+        if (!hasDeposited[msg.sender]) {
+            hasDeposited[msg.sender] = true;
+            goal.flexers += 1;
+        }
 
         // Integrate with Aave
         IPool lendingPool = IPool(provider.getPool());
         IERC20(usdcTokenAddress).approve(address(lendingPool), amount);
         lendingPool.supply(usdcTokenAddress, amount, address(this), 0);
 
-        // Store initial aToken balance after deposit
-        if (initialATokenBalance == 0) {
-            initialATokenBalance = aToken.balanceOf(address(this));
-        }
+        // Update pooledWithInterest
+        goal.pooledWithInterest = aToken.balanceOf(address(this));
+
+        emit Deposit(msg.sender, amount);
+        emit GoalInfoUpdated(goal.name, goal.goal, goal.pooled, goal.target, goal.deadline, goal.flexers, goal.pooledWithInterest);
     }
 
     function withdraw(uint256 amount) public nonReentrant {
@@ -65,30 +77,31 @@ contract FlexClub is ReentrancyGuard {
         lendingPool.withdraw(usdcTokenAddress, amount, address(this));
 
         IERC20(usdcTokenAddress).transfer(msg.sender, amount);
-        balances[msg.sender] = effectiveBalance - amount;
+        balanceWithoutInterest[msg.sender] = effectiveBalance - amount;
         goal.pooled -= amount;
+
+        // Update pooledWithInterest
+        goal.pooledWithInterest = aToken.balanceOf(address(this));
 
         // Update initial aToken balance after withdrawal
         if (goal.pooled == 0) {
             initialATokenBalance = 0;
         }
+
+        emit Withdrawal(msg.sender, amount);
+        emit GoalInfoUpdated(goal.name, goal.goal, goal.pooled, goal.target, goal.deadline, goal.flexers, goal.pooledWithInterest);
     }
 
-    function getGoalInfo() public view returns (string memory, string memory, uint256, uint256, uint256, uint256) {
-        return (goal.name, goal.goal, goal.pooled, goal.target, goal.deadline, goal.flexers);
+    function getGoalInfo() public view returns (string memory, string memory, uint256, uint256, uint256, uint256, uint256) {
+        return (goal.name, goal.goal, goal.pooled, goal.target, goal.deadline, goal.flexers, goal.pooledWithInterest);
     }
 
     function checkInterestEarned() public view returns (uint256) {
         return aToken.balanceOf(address(this));
     }
 
-    function calculateInterestEarned() public view returns (uint256) {
-        uint256 currentATokenBalance = aToken.balanceOf(address(this));
-        return currentATokenBalance > initialATokenBalance ? currentATokenBalance - initialATokenBalance : 0;
-    }
-
     function getEffectiveBalance(address user) public view returns (uint256) {
-        uint256 userShare = (balances[user] * aToken.balanceOf(address(this))) / goal.pooled;
+        uint256 userShare = (balanceWithoutInterest[user] * aToken.balanceOf(address(this))) / goal.pooled;
         return userShare;
     }
 }
