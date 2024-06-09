@@ -7,9 +7,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  const usdcTokenAddress = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"; // Real USDC on Sepolia
-  const aaveProviderAddress = "0xd449FeD49d9C443688d6816fE6872F21402e41de"; // Aave PoolAddressesProvider on Sepolia
-  const aTokenAddress = "0xf53B60F4006cab2b3C4688ce41fD5362427A2A66"; // aToken address for USDC on Sepolia
+  const usdcTokenAddress = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"; // USDC on Base Mainnet
+  const aaveProviderAddress = "0xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D"; // Aave PoolAddressesProvider on Base Mainnet
+  const aTokenAddress = "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB"; // aToken address for USDC on Base Mainnet
 
   const deadline = 1725926400; // Unix timestamp for 10 October 2024
   const goalName = "Devcon Bangkok Trip";
@@ -25,7 +25,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       goalName,
       goalDescription,
       targetAmount,
-      aTokenAddress, // Add aToken address
+      aTokenAddress,
     ],
     log: true,
   });
