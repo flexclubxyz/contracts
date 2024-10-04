@@ -8,15 +8,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   // Donation wallet address
-  const donationWallet = "replace with donation wallet address";
+  const donationWallet = "donation wallet";
 
   // Deadline: Unix timestamp for 20 October 2024
   const deadline = 1729468799; // 20 October 2024, 23:59:59 UTC
 
   // Goal details
   const goalName = "Devcon Fundraiser";
-  const goalDescription = "Raising funds for Ash to attend Devcon 2024";
-  const targetAmountInETH = "0.001"; // Target amount in ETH // $1569
+  const goalDescription = "Raising funds for ashmoney.eth to attend Devcon";
+  const targetAmountInETH = "0.69"; // Target amount in ETH // $1569
   const targetAmount = ethers.utils.parseEther(targetAmountInETH); // Converts ETH to wei
 
   await deploy("FlexClub003", {
