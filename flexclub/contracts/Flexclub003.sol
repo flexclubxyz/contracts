@@ -20,7 +20,7 @@ contract FlexClub003 is ReentrancyGuard {
     bool public fundsWithdrawn;
 
     event Deposit(address indexed user, uint256 amount);
-    event Withdrawal(address indexed donationWallet, uint256 amount);
+    event Withdrawal(address indexed recipient, uint256 amount);
     event GoalInfoUpdated(
         string name,
         string description,
@@ -99,6 +99,34 @@ contract FlexClub003 is ReentrancyGuard {
             goal.name,
             goal.description,
             0, // Reset pooled amount to zero
+            goal.target,
+            goal.deadline,
+            goal.contributors
+        );
+    }
+
+    /**
+     * @notice Allows users to refund their contribution and withdraw their deposited amount
+     *         provided the donation wallet hasn't withdrawn the funds yet.
+     */
+    function refund() public nonReentrant {
+        require(!fundsWithdrawn, "Funds have already been withdrawn");
+        uint256 userBalance = balances[msg.sender];
+        require(userBalance > 0, "No balance to withdraw");
+
+        // Update state before transferring to prevent reentrancy attacks
+        balances[msg.sender] = 0;
+        goal.pooled -= userBalance;
+
+        // Transfer the user's ETH back
+        (bool success, ) = msg.sender.call{value: userBalance}("");
+        require(success, "Transfer failed");
+
+        emit Withdrawal(msg.sender, userBalance);
+        emit GoalInfoUpdated(
+            goal.name,
+            goal.description,
+            goal.pooled,
             goal.target,
             goal.deadline,
             goal.contributors
