@@ -8,7 +8,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   // Donation wallet address
-  const donationWallet = "donation wallet";
+  const donationWallet = "0x04333a1788a47068b9102D2d35695c312A0b312F";
 
   // Deadline: Unix timestamp for 20 October 2024
   const deadline = 1729468799; // 20 October 2024, 23:59:59 UTC
