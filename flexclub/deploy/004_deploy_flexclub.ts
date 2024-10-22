@@ -15,8 +15,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   // Goal details
   const goalName = "ETHGlobal Fundraiser";
-  const goalDescription = "Raising Funds to attend ETHGlobal Bangkok";
-  const targetAmountInETH = "0.5"; // Target amount in ETH ~$1300
+  const goalDescription =
+    "Raising Funds for gabrieltemtsen to attend ETHGlobal Bangkok";
+  const targetAmountInETH = "0.49"; // Target amount in ETH ~$1300
   const targetAmount = ethers.utils.parseEther(targetAmountInETH); // Converts ETH to wei
 
   await deploy("FlexClub004", {
