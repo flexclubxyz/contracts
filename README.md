@@ -20,6 +20,10 @@ Flexclub smart contracts are designed to manage onchain goal-based saving clubs.
 
    - [Smart Contract on Base](https://basescan.org/address/0x86b03BF27Bc858c77725Dd0EbeB36653C6e6d31f)
 
+4. **Flexclub004**
+
+   - [Smart Contract on Base](https://basescan.org/address/0x50E411Cd0219FF94e7683cbc379ffd907567F386)
+
 ## Problem Solved
 
 Flexclub addresses key issues in traditional saving methods by providing:
